@@ -1,3 +1,7 @@
+	.data
+	.align 0
+#aux: .asciiz "00010001"
+
 	.text
 	.globl binary_to_decimal
 	
@@ -7,47 +11,39 @@
 #	- $ra: endereço de retorno para o local de chamada
 #
 # Retorno:
-#	- $v0: endereço do primeiro byte da string decimal
-#	- $v1: comprimento da string decimal
+#	- $v0: valor do decimal
 
-
-#$t0 - valor
-#$t1 carregado
-#$t2 endereço relativo
-#$t3 multi
-#$t4 valor binario
-#$t5 multi 2
 binary_to_decimal :
-	move $t0, $zero 
-	move $v1, $zero
-	mul $t2, $a1, 4 # endereço final da string binaria em relação ao inicio dela	
-	addu $t3, $zero, 1 #$t3 é usado como valor da multiplicador da base binaria
-	add $t5, $zero , 1
-	add $t6, $zero , 10
+	#la $a0, aux
+	#li $a1, 8
+
+	addi $sp, $sp, -8
+	sw $a0, 0 ($sp)
+	sw $a1, 4 ($sp)
 	
-	binary_register:#passa o valor binaria da string para um registrador($t0) em unsigned int 32
-		
-		addu $t1,$a0,$t2 #passa para $t1 o endereço da posição de menor valor ainda não computada da string binaria
-		lw $t4,($t1)
-		mul $t4, $t4,$t3
- 		addu $t0, $t0, $t4
- 		
-		beq $a0, $t1, register_decimal #se o enderço computado for o mesmo do inicio da string, sai do loop
-		
-		add $t2, $t2, -4
-		sll $t5, $t5, 1
-		
-		j binary_register
+	add $t0, $a0, $a1
+	addi $t0, $t0, -1#t0 agora armazena o endereço do ultimo caractere da string binaria ja validada
+	addi $t1, $0, 1#armazena a potencia de 2 atual
+	addi $t2, $0, 2#armazena o 2 para a potencia, ja que nao existe "multiply immediate"	
+	addi $t3, $0, 0
 	
-	register_decimal :#passa o valor de $t0 para uma string
-		add $v1, $v1 ,1
-		div $t0,$t6
-		mflo $t0  	#$t0=$t0/$t6
-		mfhi $t1	#$t1=$t0//$t6	
-		
-		sw $t1,($t2)	#salva o valor de $t1 no endereço $t2
-		add $t2, $t2, 4 #soma mais 4 no endereço de $t2
-		bne $t0, $zero, register_decimal #loop:enquando valor de $t0/10 diferente de 0
+	startLoop:
+	beqz $a1, endLoop
+	lb $t4, 0($t0)#t4 recebe o ultimo caractere da string
+	addi $t4, $t4, -48#dele e subtraido 48, para alinhar a tabela ascii com os valores numericos
+	mul $t4, $t4, $t1#esse caractere e multiplicado pela potencia de 2 atual
+	add $t3, $t3, $t4#e somado ao registrador que acumula o valor final do decimal
 	
-	move $v0, $a0
+	mul $t1, $t1, $t2#atualiza-se a potencia de 2
+	addi $a1, $a1, -1#subtrai-se 1 do comprimento da string, para saber quando ela acaba
+	addi $t0, $t0, -1#decrementa-se o endereco de t0
+	j startLoop
+	endLoop:
+	
+	addi $v0, $t3, 0
+	lw $a1, 4 ($sp)
+	lw $a0, 0 ($sp)
+	addi $sp, $sp, 8
 	jr $ra
+	#li $v0, 10
+	#syscall

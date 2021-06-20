@@ -177,8 +177,12 @@ main:
 		addi $t1, $t1, 4
 		add $a0, $t1, $sp
 		move $a1, $t0
-		jal TODO
+		jal hex_to_dec
 		sw $v0, 0 ($sp)
+		
+		move $a0, $v0
+		li $v0, 1
+		syscall
 	
 	# Seleção da base de saída
 	main_output_base_select:
@@ -263,9 +267,3 @@ main:
 		add $sp, $sp, $t0
 		li $v0, 10
 		syscall
-
-
-# CONVERSÃO PARA DECIMAL INTERMEDIÁRIO
-TODO:
-	li $v0, 100
-	jr $ra

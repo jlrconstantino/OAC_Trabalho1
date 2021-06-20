@@ -13,7 +13,7 @@ imprimir_inteiro_na_base:
 	sw $a0, 0 ($sp)
 	sw $a1, 4 ($sp)
 
-	add $t0, $a0, $0#t0 é o número a ser convertido
+	addu $t0, $a0, $0#t0 é o número a ser convertido
 	add $t1, $a1, $0#t1 é a base à qual esse valor deve ser convertido
 	li $t2, 10#t2 é 10, pra ser usado num if mais pra frente
 	la $t3, numero#t3 é o endereço da string na qual o novo número vai ser impresso
@@ -39,7 +39,7 @@ imprimir_inteiro_na_base:
 	
 	addi $t3, $t3, 1#n loop de saida, e decrementado 1 de t3, o que faz com que o endereço armazenado seja uma unidade anterior a desejada
 
-	add $s0, $t3, $0#armazena o endereco da string em s0
+	addu $s0, $t3, $0#armazena o endereco da string em s0
 	#parte de impressao de teste
 	add $a0, $0, $t3
 	li $v0, 4
