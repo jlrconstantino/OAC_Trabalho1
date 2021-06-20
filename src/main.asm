@@ -179,10 +179,6 @@ main:
 		move $a1, $t0
 		jal hex_to_dec
 		sw $v0, 0 ($sp)
-		
-		move $a0, $v0
-		li $v0, 1
-		syscall
 	
 	# Seleção da base de saída
 	main_output_base_select:
